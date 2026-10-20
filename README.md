@@ -24,3 +24,10 @@ The trade-off: 64-bit range only. Python integers are arbitrary precision, but t
 ## The awkward edge
 
 `decode` reads from a stream one byte at a time. A truncated stream — where the continuation bit is set but no terminating byte arrives — raises `ValueError("unexpected end of stream")` rather than blocking indefinitely. If you're reading from a live socket, buffer a complete message before decoding, or be prepared to handle this exception on partial reads.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
